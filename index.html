@@ -8,7 +8,9 @@
 <body>
   <script>
     // Check if the user email is registered in the session
-    fetch('/check-user')
+    fetch('/check-user', {
+      credentials: 'include'      // <--- Add this to include cookies
+    })
       .then(response => response.json())
       .then(data => {
         if (!data.email) {
@@ -19,6 +21,7 @@
               headers: {
                 'Content-Type': 'application/json'
               },
+              credentials: 'include', // <--- Add this to include cookies
               body: JSON.stringify({ email: email })
             })
             .then(response => response.json())
