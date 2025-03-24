@@ -7,24 +7,21 @@
 </head>
 <body>
   <script>
-    // Use absolute URLs to ensure requests are directed to the docker automation domain.
-    const backendUrl = 'https://dockerautomation-production.up.railway.app';
-
-    // Check if the user email is registered in the session on the docker automation domain
-    fetch(`${backendUrl}/check-user`, {
-      credentials: 'include'      // include cookies from the backend domain
+    // Check if the user email is registered in the session
+    fetch('/check-user', {
+      credentials: 'include'      // <--- Add this to include cookies
     })
       .then(response => response.json())
       .then(data => {
         if (!data.email) {
           var email = prompt("Please enter your email for support:");
           if (email) {
-            fetch(`${backendUrl}/register-email`, {
+            fetch('/register-email', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json'
               },
-              credentials: 'include', // include cookies from the backend domain
+              credentials: 'include', // <--- Add this to include cookies
               body: JSON.stringify({ email: email })
             })
             .then(response => response.json())
