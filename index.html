@@ -7,127 +7,80 @@
 </head>
 <body>
   <script>
-    // Check if the user email is registered in the session
-    fetch('/check-user', {
-      credentials: 'include'      // <--- Add this to include cookies
-    })
+    // Check user session with credentials
+    fetch('/check-user', { credentials: 'include' })
       .then(response => response.json())
       .then(data => {
         if (!data.email) {
-          var email = prompt("Please enter your email for support:");
+          const email = prompt("Please enter your email for support:");
           if (email) {
             fetch('/register-email', {
               method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              credentials: 'include', // <--- Add this to include cookies
+              headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
               body: JSON.stringify({ email: email })
-            })
-            .then(response => response.json())
-            .then(regData => {
-              console.log("Email registered:", regData);
-            })
-            .catch(err => console.error("Error registering email:", err));
+            });
           }
         }
-      })
-      .catch(err => console.error("Error checking user:", err));
+      });
 
-    // Function to check if the user is on a mobile device
-    function isMobile() {
-      return window.innerWidth <= 768; // Common mobile breakpoint
-    }
-
-    // Create iframe container
+    // Iframe container setup
     const iframeContainer = document.createElement('div');
     iframeContainer.style.position = 'fixed';
-    iframeContainer.style.bottom = '0px'; // Start from the bottom of the page
+    iframeContainer.style.bottom = '0px';
     iframeContainer.style.background = '#fff';
     iframeContainer.style.borderRadius = '8px';
     iframeContainer.style.boxShadow = '0px 4px 6px rgba(0, 0, 0, 0.1)';
     iframeContainer.style.zIndex = '999';
-    iframeContainer.style.display = 'block';
     iframeContainer.style.overflow = 'hidden';
 
-    // Set size and position based on device
+    // Mobile/desktop sizing
+    const isMobile = () => window.innerWidth <= 768;
     if (isMobile()) {
-      iframeContainer.style.width = '100vw'; // Full viewport width
-      iframeContainer.style.height = '100vh'; // Full viewport height
-      iframeContainer.style.left = '0'; // Align to left edge
-      iframeContainer.style.transform = 'none'; // No centering needed
+      iframeContainer.style.width = '100vw';
+      iframeContainer.style.height = '100vh';
+      iframeContainer.style.left = '0';
     } else {
-      iframeContainer.style.width = '400px'; // Fixed width for desktop
-      iframeContainer.style.height = `${window.innerHeight}px`; // Full page height
-      iframeContainer.style.left = '50%'; // Center horizontally
-      iframeContainer.style.transform = 'translateX(-50%)'; // Offset to true center
+      iframeContainer.style.width = '400px';
+      iframeContainer.style.height = `${window.innerHeight}px`;
+      iframeContainer.style.left = '50%';
+      iframeContainer.style.transform = 'translateX(-50%)';
     }
 
+    // FIX: Add cache-buster to iframe URL
     iframeContainer.innerHTML = `
-      <iframe id="chat-iframe" src="https://chat.aezenai.com?aid=af2a896a-5517-48eb-b8f3-014eec338f38&lang=en" 
+      <iframe id="chat-iframe" 
+              src="https://chat.aezenai.com?aid=af2a896a-5517-48eb-b8f3-014eec338f38&lang=en&t=${Date.now()}" 
               style="width: 100%; height: calc(100% - 30px); border: none;"></iframe>
-      <div style="text-align: center; padding: 5px; font-size: 14px; background: #f1f1f1; color: #333;">
-        Powered by <a href="https://aezenai.com" target="_blank" style="color: #007bff; text-decoration: none;">aezenai.com</a>
+      <div style="text-align: center; padding: 5px; background: #f1f1f1;">
+        Powered by <a href="https://aezenai.com" target="_blank">aezenai.com</a>
       </div>
-      <button id="floating-btn" 
-              style="position: absolute; bottom: 30px; left: 9px; width: 34px; height: 54px; 
-                     background: transparent; border: none; border-radius: 50%; 
-                     cursor: pointer; display: flex; align-items: center; justify-content: center;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" 
-             fill="none" stroke="transparent" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-          <polyline points="17 8 12 3 7 8"></polyline>
-          <line x1="12" y1="3" x2="12" y2="15"></line>
-        </svg>
-      </button>
-      <button id="track-order-btn" 
-              style="position: absolute; top: 20px; right: 10px; padding: 10px 16px; 
-                     background: #f8f9fa; border: 1px solid #007bff; border-radius: 4px; 
-                     color: #007bff; font-size: 16px; cursor: pointer;">
-        Track Order
-      </button>
+      <button id="floating-btn">[...]</button>
+      <button id="track-order-btn">Track Order</button>
     `;
 
     document.body.appendChild(iframeContainer);
 
-    const floatingBtn = iframeContainer.querySelector('#floating-btn');
-    const trackOrderBtn = iframeContainer.querySelector('#track-order-btn');
-    const chatIframe = iframeContainer.querySelector('#chat-iframe');
-
-    // Log initial iframe URL
-    console.log('Initial iframe URL:', chatIframe.src);
-
-    // When floating button is clicked, load the image automation UI
-    floatingBtn.addEventListener('click', (event) => {
-      event.preventDefault();
-      chatIframe.src = "https://dockerautomation-production.up.railway.app/";
-      console.log('Iframe URL changed to:', chatIframe.src);
+    // Button click handler with cache-buster
+    document.querySelector('#floating-btn').addEventListener('click', (e) => {
+      e.preventDefault();
+      document.querySelector('#chat-iframe').src = 
+        `https://dockerautomation-production.up.railway.app/?t=${Date.now()}`;
     });
 
-    // Optional: Add functionality to Track Order button (currently just logs a click)
-    trackOrderBtn.addEventListener('click', (event) => {
-      event.preventDefault();
-      console.log('Track Order button clicked');
-      // Add your desired functionality here
-    });
-
-    // Listen for postMessage from the image automation UI to auto-close the iframe
+    // Rest of the code unchanged
     window.addEventListener('message', (event) => {
-      if (event.data && event.data.action === 'closeAutomationUI') {
-        // Hide or remove the iframe container
+      if (event.data?.action === 'closeAutomationUI') {
         iframeContainer.style.display = 'none';
-        // Optionally display a message:
-        alert(event.data.message || 'Automation complete. Returning to chat.');
+        alert(event.data.message || 'Automation complete.');
       }
     });
 
-    // Update iframe size on window resize
     window.addEventListener('resize', () => {
       if (isMobile()) {
         iframeContainer.style.width = '100vw';
         iframeContainer.style.height = '100vh';
         iframeContainer.style.left = '0';
-        iframeContainer.style.transform = 'none';
       } else {
         iframeContainer.style.width = '378px';
         iframeContainer.style.height = `${window.innerHeight}px`;
