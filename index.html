@@ -3,244 +3,167 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Upload Image</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
-      rel="stylesheet"
-    />
+    <title>Floating Chat Iframe</title>
     <style>
+      /* Reset default margins and paddings */
+      html,
       body {
-        font-family: "Poppins", sans-serif;
-        background: linear-gradient(135deg, #667eea, #764ba2);
-        color: white;
-        text-align: center;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100vh;
         margin: 0;
+        padding: 0;
       }
-      .container {
-        background: rgba(255, 255, 255, 0.15);
-        backdrop-filter: blur(10px);
-        padding: 30px;
-        border-radius: 12px;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-        width: 350px;
+      
+      /* Hide scrollbars globally for WebKit browsers */
+      ::-webkit-scrollbar {
+        width: 0px;
+        background: transparent;
       }
-      h2,
-      h1 {
-        margin-bottom: 15px;
+      ::-webkit-scrollbar-thumb {
+        background: transparent;
       }
-      input {
-        width: 90%;
-        padding: 10px;
-        margin: 10px 0;
-        border: none;
-        border-radius: 5px;
-        outline: none;
-        font-size: 16px;
+      /* For Firefox */
+      * {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
       }
-      button {
-        width: 100%;
-        padding: 12px;
-        border: none;
-        border-radius: 5px;
-        background: #ff9800;
-        color: white;
-        font-size: 16px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: 0.3s ease-in-out;
-      }
-      button:hover {
-        background: #e68a00;
-      }
-      #emailPopup,
-      #uploadSection,
-      #loadingScreen {
-        display: none;
-      }
-      /* Loading Screen */
-      #loadingScreen {
+      
+      /* Chat Container Styles */
+      .chat-container {
         position: fixed;
-        top: 0;
-        left: 0;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 400px;
+        height: 100vh;
+        background: #fff;
+        border-radius: 8px 8px 0 0;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        z-index: 999;
+      }
+      @media (max-width: 768px) {
+        .chat-container {
+          width: 100vw;
+          left: 0;
+          transform: none;
+        }
+      }
+      .chat-container iframe {
         width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.8);
+        height: calc(100% - 30px);
+        border: none;
+      }
+      .chat-container .footer {
+        text-align: center;
+        padding: 5px;
+        font-size: 14px;
+        background: #f1f1f1;
+        color: #333;
+      }
+      .chat-container .floating-btn {
+        position: absolute;
+        bottom: 30px;
+        left: 9px;
+        width: 34px;
+        height: 54px;
+        background: transparent;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        flex-direction: column;
-        color: white;
-        font-size: 18px;
       }
-      .spinner {
-        width: 50px;
-        height: 50px;
-        border: 6px solid rgba(255, 255, 255, 0.3);
-        border-top-color: white;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        margin-bottom: 15px;
-      }
-      @keyframes spin {
-        to {
-          transform: rotate(360deg);
-        }
-      }
-      /* Popup Confirmation */
-      #popupMessage {
-        display: none;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: white;
-        color: black;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-        text-align: center;
-      }
-      /* Responsive Styles - DO NOT REMOVE OR CHANGE ANYTHING ELSE */
-      @media (max-width: 480px) {
-        .container {
-          width: 90%;
-          padding: 20px;
-        }
-        h2,
-        h1 {
-          font-size: 1.2rem;
-          margin-bottom: 10px;
-        }
-        input,
-        button {
-          font-size: 14px;
-          padding: 10px;
-        }
+      .chat-container .track-order-btn {
+        position: absolute;
+        top: 20px;
+        right: 10px;
+        padding: 10px 16px;
+        background: #f8f9fa;
+        border: 1px solid #007bff;
+        border-radius: 4px;
+        color: #007bff;
+        font-size: 16px;
+        cursor: pointer;
       }
     </style>
   </head>
   <body>
-    <!-- Email Popup (shown only for first-time visitors) -->
-    <div id="emailPopup" class="container">
-      <h2>Enter Your Email</h2>
-      <input
-        type="email"
-        id="emailInput"
-        placeholder="Enter your email..."
-        required
-      />
-      <button id="submitEmail">Submit</button>
+    <!-- Main Chat Iframe Container -->
+    <div class="chat-container">
+      <iframe
+        id="chat-iframe"
+        src="https://chat.aezenai.com?aid=af2a896a-5517-48eb-b8f3-014eec338f38&lang=en"
+      ></iframe>
+      <div class="footer">
+        Powered by
+        <a href="https://aezenai.com" target="_blank" style="color: #007bff; text-decoration: none;">aezenai.com</a>
+      </div>
+      <button class="floating-btn" id="openRailwayBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="transparent" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="17 8 12 3 7 8"></polyline>
+          <line x1="12" y1="3" x2="12" y2="15"></line>
+        </svg>
+      </button>
+      <button class="track-order-btn" id="trackOrderBtn">Track Order</button>
     </div>
-    <!-- Upload Section (shown once email is stored) -->
-    <div id="uploadSection" class="container">
-      <h1>Upload an Image</h1>
-      <input type="file" id="imageInput" accept="image/*" />
-      <button id="uploadButton">Upload</button>
-    </div>
-    <!-- Loading Overlay -->
-    <div id="loadingScreen">
-      <div class="spinner"></div>
-      <p>Wait while we send your picture to our agent...</p>
-    </div>
-    <!-- Popup Message -->
-    <div id="popupMessage">
-      <p>Your image has been sent to the chatbot successfully!</p>
-    </div>
+
     <script>
-      $(document).ready(function () {
-        // Ensure that all AJAX requests include credentials (cookies)
-        $.ajaxSetup({
-          xhrFields: { withCredentials: true },
-        });
-
-        // If the page is inside an iframe, request storage access automatically (Chrome workaround)
-        if (window.self !== window.top && document.requestStorageAccess) {
-          document
-            .requestStorageAccess()
-            .then(function () {
-              console.log("Storage access granted.");
-            })
-            .catch(function (error) {
-              console.log("Storage access denied.", error);
-            });
-        }
-
-        // Ensure the loading overlay is hidden on page load
-        $("#loadingScreen").hide();
-
-        // Check if the user is already registered
-        $.get("/check-user", function (data) {
-          if (data.email) {
-            $("#uploadSection").fadeIn();
+      // Check if the user email is registered in the session
+      fetch("/check-user", { credentials: "include" })
+        .then((response) => response.json())
+        .then((data) => {
+          if (!data.email) {
+            var email = prompt("Please enter your email for support:");
+            if (email) {
+              fetch("/register-email", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ email: email }),
+              })
+                .then((response) => response.json())
+                .then((regData) => {
+                  console.log("Email registered:", regData);
+                  localStorage.setItem("user_email", email);
+                })
+                .catch((err) => console.error("Error registering email:", err));
+            }
           } else {
-            $("#emailPopup").fadeIn();
+            localStorage.setItem("user_email", data.email);
           }
-        });
+        })
+        .catch((err) => console.error("Error checking user:", err));
 
-        $("#submitEmail").click(function () {
-          var email = $("#emailInput").val().trim();
-          if (!email) {
-            alert("Please enter a valid email.");
-            return;
-          }
+      // Calculate responsive popup dimensions
+      function getPopupFeatures() {
+        const width = Math.min(500, window.innerWidth * 0.9);
+        const height = Math.min(600, window.innerHeight * 0.9);
+        const left = (window.screen.width - width) / 2;
+        const top = (window.screen.height - height) / 2;
+        return `width=${width},height=${height},left=${left},top=${top},toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes`;
+      }
 
-          $.ajax({
-            url: "/register-email",
-            type: "POST",
-            contentType: "application/json",
-            data: JSON.stringify({ email: email }),
-            success: function () {
-              $("#emailPopup").fadeOut();
-              $("#uploadSection").fadeIn();
-            },
-            error: function (xhr) {
-              alert("Error: " + xhr.responseText);
-            },
-          });
-        });
+      // When the floating button is clicked, open Railway app in a popup window
+      document.getElementById("openRailwayBtn").addEventListener("click", (event) => {
+        event.preventDefault();
+        let emailParam = "";
+        const storedEmail = localStorage.getItem("user_email");
+        if (storedEmail) {
+          emailParam = "?email=" + encodeURIComponent(storedEmail);
+        }
+        const popupFeatures = getPopupFeatures();
+        window.open(
+          "https://dockerautomation-production.up.railway.app" + emailParam,
+          "railwayPopup",
+          popupFeatures
+        );
+      });
 
-        $("#uploadButton").click(function () {
-          var fileInput = $("#imageInput")[0].files[0];
-          if (!fileInput) {
-            alert("Please select an image.");
-            return;
-          }
-
-          var formData = new FormData();
-          formData.append("image", fileInput);
-          $("#loadingScreen").show(); // Instant display
-
-          $.ajax({
-            url: "/upload-image",
-            type: "POST",
-            data: formData,
-            contentType: false,
-            processData: false,
-            success: function (response) {
-              if (response.popup) {
-                $("#loadingScreen").fadeOut();
-                $("#popupMessage").fadeIn();
-                setTimeout(() => {
-                  window.close(); // Close window after 2 seconds
-                }, 2000);
-              } else {
-                alert(response.message);
-              }
-            },
-            error: function (xhr) {
-              alert("Error: " + xhr.responseText);
-            },
-            complete: function () {
-              $("#loadingScreen").fadeOut(); // Smooth hide
-            },
-          });
-        });
+      // Optional: Track Order button functionality
+      document.getElementById("trackOrderBtn").addEventListener("click", (event) => {
+        event.preventDefault();
+        console.log("Track Order button clicked");
       });
     </script>
   </body>
