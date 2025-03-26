@@ -4,6 +4,34 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Floating Chat Iframe</title>
+    <style>
+      /* Remove default page margin/padding */
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      /* When modal is open, prevent page scrolling */
+      body.modal-active {
+        overflow: hidden;
+      }
+
+      /* Hide scrollbars globally for WebKit browsers */
+      ::-webkit-scrollbar {
+        width: 0px;
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: transparent;
+      }
+
+      /* For Firefox */
+      * {
+        scrollbar-width: none; /* Hides scrollbar in Firefox */
+        -ms-overflow-style: none; /* IE 10+ */
+      }
+    </style>
   </head>
   <body>
     <script>
@@ -63,8 +91,10 @@
       }
 
       iframeContainer.innerHTML = `
-      <iframe id="chat-iframe" src="https://chat.aezenai.com?aid=af2a896a-5517-48eb-b8f3-014eec338f38&lang=en" 
-              style="width: 100%; height: calc(100% - 30px); border: none;"></iframe>
+      <iframe id="chat-iframe" 
+              src="https://chat.aezenai.com?aid=af2a896a-5517-48eb-b8f3-014eec338f38&lang=en"
+              style="width: 100%; height: calc(100% - 30px); border: none;">
+      </iframe>
       <div style="text-align: center; padding: 5px; font-size: 14px; background: #f1f1f1; color: #333;">
         Powered by <a href="https://aezenai.com" target="_blank" style="color: #007bff; text-decoration: none;">aezenai.com</a>
       </div>
@@ -128,17 +158,25 @@
         modalContent.style.overflow = "hidden";
         modalContent.style.position = "relative";
 
-        // Create close button for modal (optional manual close)
+        // Create professional close button for modal
         const closeButton = document.createElement("button");
-        closeButton.textContent = "Close";
+        closeButton.innerHTML = "&times;";
         closeButton.style.position = "absolute";
         closeButton.style.top = "10px";
         closeButton.style.right = "10px";
         closeButton.style.zIndex = "1001";
-        closeButton.style.padding = "5px 10px";
+        closeButton.style.width = "30px";
+        closeButton.style.height = "30px";
+        closeButton.style.border = "none";
+        closeButton.style.borderRadius = "50%";
+        closeButton.style.backgroundColor = "#007bff";
+        closeButton.style.color = "#fff";
+        closeButton.style.fontSize = "20px";
         closeButton.style.cursor = "pointer";
+        closeButton.style.boxShadow = "0 2px 4px rgba(0, 0, 0, 0.2)";
         closeButton.addEventListener("click", () => {
           modal.remove();
+          document.body.classList.remove("modal-active");
         });
 
         // Create iframe for Railway URL (explicitly open URL inside modal)
@@ -154,6 +192,9 @@
         modalContent.appendChild(railwayIframe);
         modal.appendChild(modalContent);
         document.body.appendChild(modal);
+
+        // Disable page scroll
+        document.body.classList.add("modal-active");
 
         console.log("Opened railway modal with URL:", railwayIframe.src);
       });
@@ -171,6 +212,7 @@
           const modal = document.getElementById("railway-modal");
           if (modal) {
             modal.remove();
+            document.body.classList.remove("modal-active");
             console.log(
               "Railway modal closed automatically:",
               event.data.message || ""
